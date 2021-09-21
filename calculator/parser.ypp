@@ -1,0 +1,74 @@
+%{
+    #include<iostream>
+	#include<map>
+    #include<cmath>
+
+    #define YYDEBUG 1
+
+    using namespace std;
+
+    int yylex();
+	void yyerror(string s){
+		cerr << s << endl;
+		exit(EXIT_FAILURE);
+	}
+
+    map<string,float> promenljive;
+
+%}
+
+%union {
+    float f;
+    string *s;
+}
+
+%token <s> id_token
+%token <f> num_token
+
+
+%type <f> E
+
+%left '+' '-'
+%left '*' '/' '%'
+%left '^'
+
+%%
+program: program naredba
+| naredba
+;
+
+naredba: id_token '=' E {
+    promenljive[*$1] = $3;
+    delete $1;
+}
+| E {
+    cout<<$1<<endl;
+}
+| '\n' {
+
+}
+;
+
+E : E '+' E     { $$ = $1 + $3; }
+| E '-' E       { $$ = $1 - $3; } 
+| E '*' E       { $$ = $1 * $3; }
+| E '/' E       { $$ = $1 / $3; }
+| '(' E ')'     { $$ = $2; }
+| E '^' E { $$ = pow($1,$3); }
+| E '%' E       { $$ = fmod($1,$3); }
+| num_token { $$ = $1; }
+| id_token {
+    auto it = promenljive.find(*$1);
+	if(it == promenljive.end())
+		yyerror("Nedefinisana promenljiva");
+	$$ = it->second;
+	delete $1;
+}
+;
+%%
+
+int main(){
+    //yydebug=1;
+    yyparse();
+    return 0;
+}
