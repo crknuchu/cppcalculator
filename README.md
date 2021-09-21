@@ -6,6 +6,6 @@ enter will print out the solution\
 exit with ctr+D\
 example:\
 x = 5 + (2.3 ^ 3)\
-y = x / 2
-y
+y = x / 2\
+y\
 8.5835
